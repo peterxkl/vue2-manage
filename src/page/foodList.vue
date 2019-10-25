@@ -183,16 +183,16 @@
                 selectMenu: {},
                 selectIndex: null,
                 specsForm: {
-		          	specs: '',
-		          	packing_fee: 0,
-		          	price: 20,
-		        },
+                    specs: '',
+                    packing_fee: 0,
+                    price: 20,
+                },
                 specsFormrules: {
-		        	specs: [
-						{ required: true, message: '请输入规格', trigger: 'blur' },
-					],
-		        },
-		        specsFormVisible: false,
+                    specs: [
+                        { required: true, message: '请输入规格', trigger: 'blur' },
+                    ],
+                },
+                specsFormVisible: false,
                 expendRow: [],
             }
         },

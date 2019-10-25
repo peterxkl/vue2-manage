@@ -153,7 +153,14 @@ export const deleteResturant = restaurant_id => fetch('/shopping/restaurant/' + 
  */
 
 export const getFoods = data => fetch('/shopping/v2/foods', data);
-
+/**
+ * 获取品牌总数
+ */
+export const getBrandCount = data => fetch('/item/brands/count');
+/**
+ * 获取品牌列表
+ */
+export const getAllBrands = data => fetch('/item/brands', data);
 /**
  * 获取食品数量
  */
