@@ -6,7 +6,9 @@ Vue.use(Router)
 const login = r => require.ensure([], () => r(require('@/page/login')), 'login');
 const manage = r => require.ensure([], () => r(require('@/page/manage')), 'manage');
 const brandList = r => require.ensure([], () => r(require('@/page/brandList')), 'brandList');
+const goodsList = r => require.ensure([], () => r(require('@/page/goodsList')), 'goodsList');
 const addBrand = r => require.ensure([], () => r(require('@/page/addBrand')), 'addBrand');
+const addGood = r => require.ensure([], () => r(require('@/page/addGood')), 'addGood');
 const home = r => require.ensure([], () => r(require('@/page/home')), 'home');
 const addShop = r => require.ensure([], () => r(require('@/page/addShop')), 'addShop');
 const addGoods = r => require.ensure([], () => r(require('@/page/addGoods')), 'addGoods');
@@ -40,12 +42,20 @@ const routes = [
 		}, {
             path: '/brandList',
             component: brandList,
-            meta: ['商品管理', '品牌管理'],
+            meta: ['商品管理', '品牌列表'],
+        }, {
+            path: '/goodsList',
+            component: goodsList,
+            meta: ['商品管理', '商品列表'],
         }, {
             path: '/addBrand',
             component: addBrand,
             meta: ['添加数据', '添加品牌'],
-        },{
+        }, {
+            path: '/addGood',
+            component: addGood,
+            meta: ['添加数据', '添加商品'],
+        }, {
 			path: '/addShop',
 			component: addShop,
 			meta: ['添加数据', '添加商铺'],

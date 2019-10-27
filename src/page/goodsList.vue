@@ -2,7 +2,36 @@
     <div class="fillcontain">
         <head-top></head-top>
         <div class="table-top">
-            <el-button type="primary" @click="addBrand()">新增品牌</el-button>
+            <el-row>
+                <el-col :span="8">
+                    <el-button type="primary" @click="addGoods()">新增商品</el-button>
+                </el-col>
+                <el-col :span="8">
+                    <el-radio-group v-model="radio">
+                        <el-radio :label="3">全部</el-radio>
+                        <el-radio :label="6">上架</el-radio>
+                        <el-radio :label="9">下架</el-radio>
+                    </el-radio-group>
+                </el-col>
+                <el-col :span="8">
+                    <el-select
+                        v-model="value"
+                        multiple
+                        filterable
+                        remote
+                        reserve-keyword
+                        placeholder="请输入关键词"
+                        :remote-method="remoteMethod"
+                        :loading="loading">
+                        <el-option
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-col>
+            </el-row>
         </div>
         <div class="table_container">
             <el-table
@@ -14,16 +43,16 @@
                     prop="id">
                 </el-table-column>
                 <el-table-column
-                    label="名称"
-                    prop="name">
+                    label="标题"
+                    prop="title">
                 </el-table-column>
                 <el-table-column
-                    label="LOGO"
-                    prop="logo">
+                    label="商品分类"
+                    prop="category">
                 </el-table-column>
                 <el-table-column
-                    label="首字母"
-                    prop="letter">
+                    label="品牌"
+                    prop="brand">
                 </el-table-column>
                 <el-table-column label="操作" width="160">
                     <template slot-scope="scope">
@@ -34,6 +63,10 @@
                             size="small"
                             type="danger"
                             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                        <el-button
+                            size="small"
+                            type="danger"
+                            @click="handleObtained(scope.$index, scope.row)">下架</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -48,15 +81,15 @@
                 </el-pagination>
             </div>
 
-            <el-dialog title="修改品牌信息" v-model="dialogFormVisible">
+            <el-dialog title="修改商品信息" v-model="dialogFormVisible">
                 <el-form :model="selectTable">
-                    <el-form-item label="品牌名称" label-width="100px">
+                    <el-form-item label="商品名称" label-width="100px">
                         <el-input v-model="selectTable.name" auto-complete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="品牌字母" label-width="100px">
-                        <el-input v-model="selectTable.letter"></el-input>
+                    <el-form-item label="商品卖点" label-width="100px">
+                        <el-input v-model="selectTable.sellPoint"></el-input>
                     </el-form-item>
-                    <el-form-item label="品牌分类" label-width="100px">
+                    <el-form-item label="所属品牌" label-width="100px">
                         <el-select v-model="selectIndex" :placeholder="selectMenu.label" @change="handleSelect">
                             <el-option
                                 v-for="item in menuOptions"
@@ -66,21 +99,17 @@
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="品牌图片" label-width="100px">
-                        <el-upload
-                            class="avatar-uploader"
-                            :action="baseUrl + '/v1/addimg/food'"
-                            :show-file-list="false"
-                            :on-success="handleServiceAvatarScucess"
-                            :before-upload="beforeAvatarUpload">
-                            <img v-if="selectTable.image_path" :src="baseImgPath + selectTable.image_path" class="avatar">
-                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                        </el-upload>
+                    <el-form-item label="商品分类" label-width="100px">
+                        <el-cascader
+                            :options="categoryOptions"
+                            v-model="selectedCategory"
+                            change-on-select
+                        ></el-cascader>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="dialogFormVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="updateFood">确 定</el-button>
+                    <el-button type="primary" @click="updateGood">确 定</el-button>
                 </div>
             </el-dialog>
         </div>
@@ -98,13 +127,15 @@
                 baseImgPath,
                 tableData: [],
                 currentPage: 1,
-                limit: 10,
                 count: 0,
                 dialogFormVisible: false,
                 selectTable: {},
                 selectIndex: null,
                 menuOptions: [],
                 selectMenu: {},
+                categoryOptions: [],
+                selectedCategory: [],
+                radio: 3
             }
         },
         created() {
@@ -119,31 +150,28 @@
         methods: {
             async initData(){
                 try{
-                    // const countData = await getBrandCount();
-                    // if (countData.status == 1) {
-                    //     this.count = countData.count;
-                    // }else{
-                    //     throw new Error('获取数据失败');
-                    // }
+                    const countData = await getBrandCount();
+                    if (countData.status == 1) {
+                        this.count = countData.count;
+                    }else{
+                        throw new Error('获取数据失败');
+                    }
                     this.getAllBrands();
-
                 }catch(err){
                     console.log('获取数据失败', err);
                 }
             },
             async getAllBrands(){
-                const Brands = await getAllBrands({rows: this.limit, page: this.currentPage});
-                console.log(Brands);
+                const Brands = await getAllBrands({limit: this.limit, currentPage: this.currentPage});
                 this.tableData = [];
                 Brands.forEach((item, index) => {
                     const tableData = {};
-                    tableData.name = item.name;
+                    tableData.title = item.title;
                     tableData.id = item.id;
-                    tableData.logo = item.logo;
-                    tableData.letter = item.letter;
+                    tableData.category = item.category;
+                    tableData.brand = item.brand;
                     this.tableData.push(tableData);
                 })
-                this.count = Brands.total;
             },
             handleEdit(row) {
                 this.getSelectItemData(row, 'edit')
@@ -169,8 +197,11 @@
                     console.log('删除食品失败')
                 }
             },
-            addBrand() {
-                this.$router.push({ path: 'addBrand', query: {  }})
+            handleObtained(index, row) {
+
+            },
+            addGoods() {
+                this.$router.push({ path: 'addGood', query: {  }})
             },
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
@@ -179,26 +210,7 @@
                 this.currentPage = val;
                 this.getAllBrands()
             },
-            handleServiceAvatarScucess(res, file) {
-                if (res.status == 1) {
-                    this.selectTable.image_path = res.image_path;
-                }else{
-                    this.$message.error('上传图片失败！');
-                }
-            },
-            beforeAvatarUpload(file) {
-                const isRightType = (file.type === 'image/jpeg') || (file.type === 'image/png');
-                const isLt2M = file.size / 1024 / 1024 < 2;
-
-                if (!isRightType) {
-                    this.$message.error('上传头像图片只能是 JPG 格式!');
-                }
-                if (!isLt2M) {
-                    this.$message.error('上传头像图片大小不能超过 2MB!');
-                }
-                return isRightType && isLt2M;
-            },
-            async updateFood(){
+            async updateGood(){
                 this.dialogFormVisible = false;
                 try{
                     const subData = {new_category_id: this.selectMenu.value, specs: this.specs};

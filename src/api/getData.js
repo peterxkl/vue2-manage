@@ -160,7 +160,7 @@ export const getBrandCount = data => fetch('/item/brands/count');
 /**
  * 获取品牌列表
  */
-export const getAllBrands = data => fetch('/item/brands', data);
+export const getAllBrands = data => fetch('/item/brands/page', data);
 /**
  * 获取食品数量
  */

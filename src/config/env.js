@@ -11,7 +11,7 @@ let routerMode = 'hash';
 let baseImgPath;
 
 if (process.env.NODE_ENV == 'development') {
-	baseUrl = 'localhost:10010/api';
+	baseUrl = '/api';
     baseImgPath = '/img/';
 }else{
 	baseUrl = '//elm.cangdu.org';

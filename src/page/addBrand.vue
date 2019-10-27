@@ -10,14 +10,14 @@
                     <el-input v-model="selectTable.letter"></el-input>
                 </el-form-item>
                 <el-form-item label="品牌分类" label-width="100px">
-                    <!--                        <el-select v-model="selectIndex" :placeholder="selectMenu.label" @change="handleSelect">-->
-                    <!--                            <el-option-->
-                    <!--                                v-for="item in menuOptions"-->
-                    <!--                                :key="item.value"-->
-                    <!--                                :label="item.label"-->
-                    <!--                                :value="item.index">-->
-                    <!--                            </el-option>-->
-                    <!--                        </el-select>-->
+                    <el-select v-model="selectIndex" :placeholder="selectMenu.label" @change="handleSelect">
+                        <el-option
+                            v-for="item in menuOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.index">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="品牌图片" label-width="100px">
                     <el-upload
@@ -49,6 +49,9 @@
                 baseUrl,
                 baseImgPath,
                 selectTable: {},
+                selectIndex: null,
+                menuOptions: [],
+                selectMenu: {},
 
             }
         },
@@ -113,5 +116,10 @@
 <style scoped>
     .table_container{
         padding: 50px;
+        margin: 0 auto;
+        width: 40%;
+    }
+    .dialog-footer{
+        text-align: center;
     }
 </style>
