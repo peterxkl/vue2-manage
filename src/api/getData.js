@@ -162,6 +162,10 @@ export const getBrandCount = data => fetch('/item/brands/count');
  */
 export const getAllBrands = data => fetch('/item/brands/page', data);
 /**
+ * 获取商品分类列表
+ */
+export const getAllCategorys = data => fetch('/item/categorys', data);
+/**
  * 获取食品数量
  */
 

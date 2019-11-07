@@ -10,23 +10,22 @@
                     <el-input v-model="selectTable.letter"></el-input>
                 </el-form-item>
                 <el-form-item label="品牌分类" label-width="100px">
-                    <el-select v-model="selectIndex" :placeholder="selectMenu.label" @change="handleSelect">
-                        <el-option
-                            v-for="item in menuOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.index">
-                        </el-option>
-                    </el-select>
+<!--                    <ele-multi-cascader-->
+<!--                        :options="options"-->
+<!--                        v-model="form.isp"-->
+<!--                        placeholder="选择运营商"-->
+<!--                        @change="ispChange"-->
+<!--                    >-->
+<!--                    </ele-multi-cascader>-->
                 </el-form-item>
                 <el-form-item label="品牌图片" label-width="100px">
                     <el-upload
                         class="avatar-uploader"
-                        :action="baseUrl + '/v1/addimg/food'"
+                        :action="'http://localhost:8082/upload/image'"
                         :show-file-list="false"
                         :on-success="handleServiceAvatarScucess"
                         :before-upload="beforeAvatarUpload">
-                        <img v-if="selectTable.image_path" :src="baseImgPath + selectTable.image_path" class="avatar">
+                        <img v-if="selectTable.image_path" :src="selectTable.image_path" class="avatar">
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     </el-upload>
                 </el-form-item>
@@ -42,7 +41,7 @@
 <script>
     import headTop from '../components/headTop'
     import {baseUrl, baseImgPath} from '@/config/env'
-    import {getAllBrands, getBrandCount} from '@/api/getData'
+    import {getAllCategorys} from '@/api/getData'
     export default {
         data(){
             return {
@@ -52,10 +51,22 @@
                 selectIndex: null,
                 menuOptions: [],
                 selectMenu: {},
-
+                pid: 0,
+                options2: [{
+                    id: 1,
+                    name: '手机',
+                    brands: []
+                }],
+                checkList: []
+                // props: {
+                //     value: 'id',
+                //     label: 'name',
+                //     children: 'brands'
+                // }
             }
         },
         created() {
+            // this.initCascader();
         },
         computed: {
 
@@ -68,8 +79,10 @@
                 this.$refs[formName].resetFields();
             },
             handleServiceAvatarScucess(res, file) {
+                console.log(res);
                 if (res.status == 1) {
                     this.selectTable.image_path = res.image_path;
+                    console.log(this.selectTable.image_path);
                 }else{
                     this.$message.error('上传图片失败！');
                 }
@@ -108,6 +121,51 @@
                     console.log('更新餐馆信息失败', err);
                 }
             },
+            async initCascader() {
+                this.options2 = [];
+                const data = await getAllCategorys({Pid: this.pid});
+                data.forEach((item,index) => {
+                    const optionData = {};
+                    // optionData.index = index;
+                    optionData.id = item.id;
+                    optionData.name = item.name;
+                    this.options2.push(optionData);
+                })
+            },
+            // handleItemChange(val) {
+            //     console.log('active item:', val);
+            //     this.Pid = parseInt(val);
+            //     console.log(this.Pid);
+            //     this.getCategorys();
+            //     // setTimeout(_ => {
+            //     //     if (val.indexOf('图书、音像、电子书刊') > -1 && !this.options2[0].brands.length) {
+            //     //         this.options2[0].brands = [{
+            //     //             id: 3,
+            //     //             name: '图书',
+            //     //         }];
+            //     //     } else if (val.indexOf('手机、运营商、数码') > -1 && !this.options2[1].brands.length) {
+            //     //         this.options2[1].brands = [{
+            //     //             id: 4,
+            //     //             name: '手机',
+            //     //         }];
+            //     //     }
+            //     // }, 300);
+            // },
+            async getCategorys(){
+                const categorys = await getAllCategorys({Pid: this.pid});
+                this.options2.forEach((item,index) => {
+                    if (item.id === this.Pid) {
+                        categorys.forEach(item => {
+                            const optionData = {};
+                            optionData.id = item.id;
+                            optionData.name = item.name;
+                            this.options2[index].brands.push(optionData);
+                        })
+                        console.log(this.options2[index]);
+                    }
+                })
+                return categorys;
+            }
 
         }
     }

@@ -19,7 +19,7 @@
                 </el-table-column>
                 <el-table-column
                     label="LOGO"
-                    prop="logo">
+                    prop="image">
                 </el-table-column>
                 <el-table-column
                     label="首字母"
@@ -119,12 +119,6 @@
         methods: {
             async initData(){
                 try{
-                    // const countData = await getBrandCount();
-                    // if (countData.status == 1) {
-                    //     this.count = countData.count;
-                    // }else{
-                    //     throw new Error('获取数据失败');
-                    // }
                     this.getAllBrands();
 
                 }catch(err){
@@ -135,11 +129,11 @@
                 const Brands = await getAllBrands({rows: this.limit, page: this.currentPage});
                 console.log(Brands);
                 this.tableData = [];
-                Brands.forEach((item, index) => {
+                Brands.items.forEach((item, index) => {
                     const tableData = {};
                     tableData.name = item.name;
                     tableData.id = item.id;
-                    tableData.logo = item.logo;
+                    tableData.image = item.image;
                     tableData.letter = item.letter;
                     this.tableData.push(tableData);
                 })
@@ -220,7 +214,11 @@
                     console.log('更新餐馆信息失败', err);
                 }
             },
-        }
+        },
+        handleSelect(index){
+            this.selectIndex = index;
+            this.selectMenu = this.menuOptions[index];
+        },
 
     }
 </script>
