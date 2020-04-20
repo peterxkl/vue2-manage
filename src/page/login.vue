@@ -3,7 +3,7 @@
 	  	<transition name="form-fade" mode="in-out">
 	  		<section class="form_contianer" v-show="showLogin">
 		  		<div class="manage_tip">
-		  			<p>elm后台管理系统</p>
+		  			<p>第三方应用登录</p>
 		  		</div>
 		    	<el-form :model="loginForm" :rules="rules" ref="loginForm">
 					<el-form-item prop="username">
@@ -16,16 +16,14 @@
 				    	<el-button type="primary" @click="submitForm('loginForm')" class="submit_btn">登陆</el-button>
 				  	</el-form-item>
 				</el-form>
-				<p class="tip">温馨提示：</p>
-				<p class="tip">未登录过的新用户，自动注册</p>
-				<p class="tip">注册过的用户可凭账号密码登录</p>
+				<p class="tip"><a href="">使用第三方登录</a></p>
 	  		</section>
 	  	</transition>
   	</div>
 </template>
 
 <script>
-	import {login, getAdminInfo} from '@/api/getData'
+	import {login} from '@/api/getData'
 	import {mapActions, mapState} from 'vuex'
 
 	export default {
@@ -48,20 +46,21 @@
 		},
 		mounted(){
 			this.showLogin = true;
-			if (!this.adminInfo.id) {
-    			this.getAdminData()
-    		}
+			// if (!this.userInfo.id) {
+    		// 	this.getAdminData()
+    		// }
 		},
 		computed: {
-			...mapState(['adminInfo']),
+			...mapState(['userInfo']),
 		},
 		methods: {
-			...mapActions(['getAdminData']),
+			...mapActions(['setUserInfo']),
 			async submitForm(formName) {
 				this.$refs[formName].validate(async (valid) => {
 					if (valid) {
-						const res = await login({user_name: this.loginForm.username, password: this.loginForm.password})
-						if (res.status == 1) {
+						const res = await login({username: this.loginForm.username, password: this.loginForm.password})
+						if (res.status == "success") {
+						    this.setUserInfo(res.data)
 							this.$message({
 		                        type: 'success',
 		                        message: '登录成功'
@@ -70,7 +69,7 @@
 						}else{
 							this.$message({
 		                        type: 'error',
-		                        message: res.message
+		                        message: "登录失败"
 		                    });
 						}
 					} else {
@@ -85,7 +84,7 @@
 			},
 		},
 		watch: {
-			adminInfo: function (newValue){
+            userInfo: function (newValue){
 				if (newValue.id) {
 					this.$message({
                         type: 'success',

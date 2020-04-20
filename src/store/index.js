@@ -1,34 +1,31 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {getAdminInfo} from '@/api/getData'
+import {getUserInfo} from '@/api/getData'
 
 Vue.use(Vuex)
 
 const state = {
-	adminInfo: {
+	userInfo: {
 		avatar: 'default.jpg'
 	},
 }
 
 const mutations = {
-	saveAdminInfo(state, adminInfo){
-		state.adminInfo = adminInfo;
-	}
+    saveUserInfo(state, userInfo){
+		state.userInfo = userInfo;
+	},
+    deleteUserInfo(state) {
+        state.userInfo = {}
+    }
 }
 
 const actions = {
-	async getAdminData({commit}){
-		try{
-			const res = await getAdminInfo()
-			if (res.status == 1) {
-				commit('saveAdminInfo', res.data);
-			}else{
-				throw new Error(res.type)
-			}
-		}catch(err){
-			// console.log(err.message)
-		}
-	}
+	setUserInfo({commit, data}) {
+	    commit('saveUserInfo', data)
+    },
+    deleteUserInfo({commit}) {
+	    commit('deleteUserInfo')
+    }
 }
 
 export default new Vuex.Store({
